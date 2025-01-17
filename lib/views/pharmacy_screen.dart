@@ -20,7 +20,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
   List<Pharmacy> pharmacies = [];
   Pharmacy? selectedPharmacy;
   Position? currentPosition;
-  bool loading = true; // Sayfa yükleme durumu
+  bool loading = true;
   static const double distanceLimit = 10.0;
 
   @override
@@ -33,12 +33,12 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
     try {
       await _getCurrentLocation();
       setState(() {
-        loading = false; // Tüm veriler yüklendiğinde ekran görüntülenecek
+        loading = false;
       });
     } catch (e) {
       print("Hata: $e");
       setState(() {
-        loading = false; // Hata olsa bile yükleme tamamlandı
+        loading = false;
       });
     }
   }
@@ -84,7 +84,6 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
       return distance <= distanceLimit;
     }).toList();
 
-    // Eczaneleri mesafeye göre sıralama
     nearbyPharmacies.sort((a, b) {
       final distanceA = _calculateDistance(
         position.latitude,
@@ -103,10 +102,10 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
 
     setState(() {
       pharmacies = nearbyPharmacies;
-      if (pharmacies.isNotEmpty) {
-        selectedPharmacy = pharmacies.first; // İlk eczane en yakın olacak
+      selectedPharmacy = null;
+      if (currentPosition != null) {
         _mapController.move(
-          LatLng(selectedPharmacy!.latitude, selectedPharmacy!.longitude),
+          LatLng(currentPosition!.latitude, currentPosition!.longitude),
           14,
         );
       }
@@ -171,89 +170,111 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        backgroundColor: Colors.white,
         title: const Text("Nöbetçi Eczaneler"),
         centerTitle: true,
-        leading: Container(),
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : Column(
         children: [
-          _buildPharmacyList(),
-          const SizedBox(height: 10), // Liste ve harita arasında boşluk
-          _buildMap(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPharmacyList() {
-    return pharmacies.isEmpty
-        ? const Center(child: Text("Yakınlarda eczane bulunamadı."))
-        : SizedBox(
-      height: pharmacies.length <= 3 ? pharmacies.length * 80.0 : 240,
-      child: ListView.builder(
-        itemCount: pharmacies.length,
-        itemBuilder: (context, index) {
-          final pharmacy = pharmacies[index];
-          return ListTile(
-            title: Text(pharmacy.name),
-            subtitle: Text(pharmacy.address),
-            onTap: () => _onPharmacySelected(pharmacy),
-            trailing: IconButton(
-              icon: const Icon(Icons.directions),
-              onPressed: () => _launchMaps(pharmacy),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildMap() {
-    return Flexible(
-      child: FlutterMap(
-        mapController: _mapController,
-        options: MapOptions(
-          initialCenter: currentPosition != null
-              ? LatLng(currentPosition!.latitude, currentPosition!.longitude)
-              : LatLng(0, 0),
-          initialZoom: 14,
-        ),
-        children: [
-          TileLayer(
-            urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-            subdomains: ['a', 'b', 'c'],
-          ),
-          MarkerLayer(
-            markers: [
-              if (currentPosition != null)
-                Marker(
-                  point: LatLng(
-                      currentPosition!.latitude, currentPosition!.longitude),
-                  width: 40,
-                  height: 40,
-                  child: const Icon(
-                    Icons.my_location,
-                    color: Colors.blue,
+          pharmacies.isEmpty
+              ? const Center(
+            child: Text("Yakınlarda eczane bulunamadı."),
+          )
+              : SizedBox(
+            height: pharmacies.length <= 3
+                ? pharmacies.length * 100.0
+                : 300,
+            child: ListView.builder(
+              itemCount: pharmacies.length,
+              itemBuilder: (context, index) {
+                final pharmacy = pharmacies[index];
+                final isSelected = pharmacy == selectedPharmacy;
+                return Card(
+                  color: isSelected
+                      ? Colors.blue.withOpacity(0.2)
+                      : Colors.white,
+                  elevation: 3,
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 6,
+                    horizontal: 12,
                   ),
-                ),
-              ...pharmacies.map((pharmacy) {
-                return Marker(
-                  point: LatLng(pharmacy.latitude, pharmacy.longitude),
-                  width: 40,
-                  height: 40,
-                  child: GestureDetector(
+                  child: ListTile(
+                    title: Text(pharmacy.name,
+                        style: TextStyle(
+                            color: isSelected
+                                ? Colors.blue
+                                : Colors.black,
+                            fontWeight: FontWeight.bold)),
+                    subtitle: Text(pharmacy.address),
                     onTap: () => _onPharmacySelected(pharmacy),
-                    child: const Icon(
-                      Icons.location_on,
-                      color: Colors.red,
+                    trailing: IconButton(
+                      icon: const Icon(Icons.directions),
+                      onPressed: () => _launchMaps(pharmacy),
                     ),
                   ),
                 );
-              }).toList(),
-            ],
+              },
+            ),
+          ),
+          const SizedBox(height: 10),
+          Flexible(
+            child: FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: currentPosition != null
+                    ? LatLng(
+                  currentPosition!.latitude,
+                  currentPosition!.longitude,
+                )
+                    : LatLng(0, 0),
+                initialZoom: 14,
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate:
+                  "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                  subdomains: ['a', 'b', 'c'],
+                ),
+                MarkerLayer(
+                  markers: [
+                    if (currentPosition != null)
+                      Marker(
+                        point: LatLng(
+                          currentPosition!.latitude,
+                          currentPosition!.longitude,
+                        ),
+                        width: 40,
+                        height: 40,
+                        child: const Icon(
+                          Icons.my_location,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ...pharmacies.map((pharmacy) {
+                      return Marker(
+                        point: LatLng(
+                          pharmacy.latitude,
+                          pharmacy.longitude,
+                        ),
+                        width: 40,
+                        height: 40,
+                        child: GestureDetector(
+                          onTap: () => _onPharmacySelected(pharmacy),
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Colors.red,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
