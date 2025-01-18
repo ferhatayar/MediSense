@@ -302,117 +302,224 @@ class _HomeScreenState extends State<HomeScreen> {
                                 color: color,
                                 margin: const EdgeInsets.symmetric(
                                     vertical: 4.0, horizontal: 16.0),
-                                child: ListTile(
-                                  title: Text(med['name'],
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold)),
-                                  subtitle: Text(
-                                      '${med['strength']} • ${med['type']}'),
-                                  trailing: med['used'] == null
-                                      ? const Icon(Icons.access_time, color: Colors.black54,)
-                                      : med['used'] == true
-                                      ? const Icon(Icons.check, color: Colors.black54)
-                                      : const Icon(Icons.close, color: Colors.black54),
-                                  onTap: () {
-                                    showDialog(
+                                child: Dismissible(
+                                  key: Key(med['id']),
+                                  direction: DismissDirection.endToStart,
+                                  background: Container(
+                                    color: Colors.grey,
+                                    alignment: Alignment.centerRight,
+                                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                                    child: const Icon(Icons.delete, color: Colors.white),
+                                  ),
+                                  confirmDismiss: (direction) async {
+                                    final shouldDelete = await showDialog<bool>(
                                       context: context,
-                                      builder: (context) {
-                                        return Dialog(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(20.0),
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Row(
+                                            children: const [
+                                              Icon(Icons.warning, color: Colors.orange),
+                                              SizedBox(width: 8),
+                                              Text('İlacı Sil'),
+                                            ],
                                           ),
-                                          elevation: 10,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: Column(
-                                              mainAxisSize: MainAxisSize.min,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                          content: Text('${med['name']} ilacını silmek istediğinize emin misiniz?'),
+                                          actions: [
+                                            Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceAround, // Butonları ortalamak için
                                               children: [
-                                                Text(
-                                                  '${med['strength']} • $time',
-                                                  style: const TextStyle(
-                                                    fontSize: 20,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.deepPurpleAccent,
+                                                Container(
+                                                  width: 130,
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.green,
+                                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(12),
+                                                      ),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(true);
+                                                    },
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: const [
+                                                        Icon(Icons.check, color: Colors.white),
+                                                        SizedBox(width: 8),
+                                                        Text('Evet', style: TextStyle(color: Colors.white)),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                                const SizedBox(height: 10),
-                                                Text(
-                                                  '${med['strength']} • ${med['type']}',
-                                                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                                                ),
-                                                const SizedBox(height: 20),
-                                                Row(
-                                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      width:140,
-                                                      child: ElevatedButton(
-                                                        style: ElevatedButton.styleFrom(
-                                                          backgroundColor: Colors.green,
-                                                          padding: const EdgeInsets.symmetric(vertical: 12),
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(12),
-                                                          ),
-                                                        ),
-                                                        onPressed: () {
-                                                          _updateMedicationUsage(
-                                                            med['id'],
-                                                            med['time'],
-                                                            selectedDayStr,
-                                                            true,
-                                                          );
-                                                          Navigator.of(context).pop();
-                                                        },
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: const [
-                                                            Icon(Icons.check, color: Colors.white),
-                                                            SizedBox(width: 8),
-                                                            Text('Kullandım', style: TextStyle(color: Colors.white)),
-                                                          ],
-                                                        ),
+                                                Container(
+                                                  width: 130,
+                                                  child: ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.red,
+                                                      padding: const EdgeInsets.symmetric(vertical: 12),
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(12),
                                                       ),
                                                     ),
-                                                    Container(
-                                                      width: 140,
-                                                      child: ElevatedButton(
-                                                        style: ElevatedButton.styleFrom(
-                                                          backgroundColor: Colors.red,
-                                                          padding: const EdgeInsets.symmetric(vertical: 12),
-                                                          shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(12),
-                                                          ),
-                                                        ),
-                                                        onPressed: () {
-                                                          _updateMedicationUsage(
-                                                            med['id'],
-                                                            med['time'],
-                                                            selectedDayStr,
-                                                            false,
-                                                          );
-                                                          Navigator.of(context).pop();
-                                                        },
-                                                        child: Row(
-                                                          mainAxisSize: MainAxisSize.min,
-                                                          children: const [
-                                                            Icon(Icons.close, color: Colors.white),
-                                                            SizedBox(width: 8),
-                                                            Text('Kullanmadım', style: TextStyle(color: Colors.white)),
-                                                          ],
-                                                        ),
-                                                      ),
+                                                    onPressed: () {
+                                                      Navigator.of(context).pop(false);
+                                                    },
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: const [
+                                                        Icon(Icons.close, color: Colors.white),
+                                                        SizedBox(width: 8),
+                                                        Text('Hayır', style: TextStyle(color: Colors.white)),
+                                                      ],
                                                     ),
-                                                  ],
+                                                  ),
                                                 ),
                                               ],
                                             ),
-                                          ),
+                                          ],
                                         );
+
                                       },
                                     );
 
+                                    if (shouldDelete == true) {
+                                      try {
+                                        await FirebaseFirestore.instance
+                                            .collection('medications')
+                                            .doc(userId)
+                                            .collection('medicines')
+                                            .doc(med['id'])
+                                            .delete();
+
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('${med['name']} ilacı kaldırıldı')),
+                                        );
+
+                                        return true;
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Hata: ${e.toString()}')),
+                                        );
+
+                                        return false;
+                                      }
+                                    }
+
+                                    return false;
                                   },
+
+                                  child: ListTile(
+                                    title: Text(med['name'],
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    subtitle: Text(
+                                        '${med['strength']} • ${med['type']}'),
+                                    trailing: med['used'] == null
+                                        ? const Icon(Icons.access_time, color: Colors.black54,)
+                                        : med['used'] == true
+                                        ? const Icon(Icons.check, color: Colors.black54)
+                                        : const Icon(Icons.close, color: Colors.black54),
+                                    onTap: () {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return Dialog(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(20.0),
+                                            ),
+                                            elevation: 10,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(20.0),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '${med['strength']} • $time',
+                                                    style: const TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.deepPurpleAccent,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 10),
+                                                  Text(
+                                                    '${med['strength']} • ${med['type']}',
+                                                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                                                  ),
+                                                  const SizedBox(height: 20),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Container(
+                                                        width:140,
+                                                        child: ElevatedButton(
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor: Colors.green,
+                                                            padding: const EdgeInsets.symmetric(vertical: 12),
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(12),
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            _updateMedicationUsage(
+                                                              med['id'],
+                                                              med['time'],
+                                                              selectedDayStr,
+                                                              true,
+                                                            );
+                                                            Navigator.of(context).pop();
+                                                          },
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: const [
+                                                              Icon(Icons.check, color: Colors.white),
+                                                              SizedBox(width: 8),
+                                                              Text('Kullandım', style: TextStyle(color: Colors.white)),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Container(
+                                                        width: 140,
+                                                        child: ElevatedButton(
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor: Colors.red,
+                                                            padding: const EdgeInsets.symmetric(vertical: 12),
+                                                            shape: RoundedRectangleBorder(
+                                                              borderRadius: BorderRadius.circular(12),
+                                                            ),
+                                                          ),
+                                                          onPressed: () {
+                                                            _updateMedicationUsage(
+                                                              med['id'],
+                                                              med['time'],
+                                                              selectedDayStr,
+                                                              false,
+                                                            );
+                                                            Navigator.of(context).pop();
+                                                          },
+                                                          child: Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: const [
+                                                              Icon(Icons.close, color: Colors.white),
+                                                              SizedBox(width: 8),
+                                                              Text('Kullanmadım', style: TextStyle(color: Colors.white)),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+
+                                    },
+                                  ),
                                 ),
                               );
                             }).toList(),

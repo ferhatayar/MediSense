@@ -349,6 +349,7 @@ class _MedicineDurationScreenState extends State<MedicineDurationScreen> {
     super.initState();
     final medicationProvider = Provider.of<MedicationProvider>(context, listen: false);
     medicationProvider.updateMedicationStartDate(selectedDate!);
+    medicationProvider.updateMedicationDuration(selectedDays);
   }
 
 
@@ -603,6 +604,10 @@ class _MedicationStrengthInputPageState
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Lütfen ilaç miktarını giriniz';
+                        }
+                        final number = num.tryParse(value);
+                        if (number == null) {
+                          return 'Lütfen geçerli bir sayı giriniz';
                         }
                         return null;
                       },
