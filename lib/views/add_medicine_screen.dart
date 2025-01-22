@@ -209,14 +209,14 @@ class _MedicineTypeScreenState extends State<MedicineTypeScreen> {
               mainAxisSpacing: 12,
               children: [
                 _buildMedicationTypeCard("Tablet", "assets/medicines/tablet.png"),
-                _buildMedicationTypeCard("Hap", "assets/medicines/pill.png"),
-                _buildMedicationTypeCard("Toz", "assets/medicines/powder.png"),
-                _buildMedicationTypeCard("Şırınga", "assets/medicines/syringe.png"),
-                _buildMedicationTypeCard("Krem", "assets/medicines/creme.png"),
-                _buildMedicationTypeCard("Sprey", "assets/medicines/spray.png"),
-                _buildMedicationTypeCard("Sıvı", "assets/medicines/liquid.png"),
-                _buildMedicationTypeCard("Fitil", "assets/medicines/suppositorium.png"),
-                _buildMedicationTypeCard("Yama", "assets/medicines/patch.png"),
+                _buildMedicationTypeCard("Hap", "assets/medicines/hap.png"),
+                _buildMedicationTypeCard("Toz", "assets/medicines/toz.png"),
+                _buildMedicationTypeCard("Şırınga", "assets/medicines/şırınga.png"),
+                _buildMedicationTypeCard("Krem", "assets/medicines/krem.png"),
+                _buildMedicationTypeCard("Sprey", "assets/medicines/sprey.png"),
+                _buildMedicationTypeCard("Sıvı", "assets/medicines/sıvı.png"),
+                _buildMedicationTypeCard("Fitil", "assets/medicines/fitil.png"),
+                _buildMedicationTypeCard("Yama", "assets/medicines/yama.png"),
               ],
             ),
             const SizedBox(height: 20),
@@ -234,7 +234,6 @@ class _MedicineTypeScreenState extends State<MedicineTypeScreen> {
                     DropdownMenuItem(value: Colors.red, child: Text("Kırmızı")),
                     DropdownMenuItem(value: Colors.blue, child: Text("Mavi")),
                     DropdownMenuItem(value: Colors.green, child: Text("Yeşil")),
-                    DropdownMenuItem(value: Colors.yellow, child: Text("Sarı")),
                     DropdownMenuItem(value: Colors.orange, child: Text("Turuncu")),
                     DropdownMenuItem(value: Colors.pink, child: Text("Pembe")),
                   ],
@@ -254,7 +253,6 @@ class _MedicineTypeScreenState extends State<MedicineTypeScreen> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: const Text('Lütfen bir ilaç türü seçiniz'),
-                      backgroundColor: Colors.red,
                     ),
                   );
                 } else {
@@ -1023,7 +1021,7 @@ class MedicationReviewScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         title: const Text(
           "Bilgilerinizi Gözden Geçirin",
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),
         ),
         centerTitle: true,
         leading: Container(),
@@ -1185,7 +1183,6 @@ class MedicationReviewScreen extends StatelessWidget {
       return '$hour:$minute $period';
     }
 
-
     try {
       final currentId = Auth().currentUser?.uid;
       final userId = currentId;
@@ -1193,6 +1190,13 @@ class MedicationReviewScreen extends StatelessWidget {
       // Calculate finishDate
       final startDate = medication.startDate;
       final finishDate = startDate.add(Duration(days: medication.durationDays - 1));
+
+      // Calculate totalMedicine
+      final dailyTotalMedicine = medication.times.fold<int>(
+        0,
+            (total, time) => total + time.count,
+      );
+      final totalMedicine = dailyTotalMedicine * medication.durationDays;
 
       // Prepare medication data for main document
       final medicationData = {
@@ -1204,6 +1208,8 @@ class MedicationReviewScreen extends StatelessWidget {
         'startDate': startDate.toIso8601String().split('T')[0],
         'finishDate': finishDate.toIso8601String().split('T')[0],
         'addedDate': DateTime.now().toIso8601String(),
+        'usedMedicine': 0,
+        'totalMedicine': totalMedicine,
         'times': medication.times.map((time) {
           return {
             'time': TimeOfDay.fromDateTime(time.time).format(context),
@@ -1247,6 +1253,7 @@ class MedicationReviewScreen extends StatelessWidget {
       print("İlacı Firebase'e kaydederken hata oluştu: $e");
     }
   }
+
 
 
 

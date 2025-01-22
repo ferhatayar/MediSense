@@ -174,6 +174,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: const Text("Nöbetçi Eczaneler"),
+        leading: Container(),
         centerTitle: true,
       ),
       body: loading

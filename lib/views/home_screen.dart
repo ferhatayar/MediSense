@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:medisense_app/services/auth.dart';
 import 'package:medisense_app/views/add_medicine_screen.dart';
+import 'package:medisense_app/views/medication_details_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'dart:core';
 
@@ -18,38 +19,14 @@ class _HomeScreenState extends State<HomeScreen> {
   final DateTime today = DateTime.now();
   DateTime _selectedDay = DateTime.now();
 
-  void _updateMedicationUsage(String docId, String time, String date, bool used) async {
-    try {
-      final medicationRef = FirebaseFirestore.instance
-          .collection('medications')
-          .doc(userId)
-          .collection('medicines')
-          .doc(docId);
-
-      final logRef = medicationRef.collection('logs').doc(date);
-
-      final logSnapshot = await logRef.get();
-
-      if (logSnapshot.exists) {
-        final logData = logSnapshot.data() as Map<String, dynamic>?;
-
-        if (logData != null) {
-          final times = logData['times'] as List<dynamic>?;
-
-          if (times != null) {
-            final index = times.indexWhere((entry) => entry['time'] == time);
-            if (index != -1) {
-              times[index]['used'] = used;
-              await logRef.update({'times': times});
-              setState(() {
-              });
-            }
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint('Güncelleme hatası: $e');
-    }
+  Color parseFirebaseColor(String firebaseColor) {
+      final color = Color(int.tryParse(
+          firebaseColor
+              .split('(0x')[1]
+              .split(')')[0],
+          radix: 16) ??
+          0xFFFFFFFF);
+      return color;
   }
 
   @override
@@ -140,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 final medications = snapshot.data?.docs ?? [];
                 final selectedDayStr =
                 _selectedDay.toIso8601String().split('T')[0];
+                print("selectedDay: $selectedDayStr");
 
                 return FutureBuilder<List<Map<String, dynamic>>>(
                   future: Future.wait(
@@ -172,6 +150,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             'type': doc['type'] ?? 'Bilinmiyor',
                             'time': time['time'] ?? '00:00',
                             'used': time['used'],
+                            'usedMedicine' : doc['usedMedicine'] ?? 0,
+                            'totalMedicine' : doc['totalMedicine'] ?? 0,
+                            'durationDays' : doc['durationDays'] ?? 0,
                             'addedDate': doc['addedDate'] ??
                                 DateTime.now().toIso8601String(),
                           };
@@ -420,104 +401,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ? const Icon(Icons.check, color: Colors.black54)
                                         : const Icon(Icons.close, color: Colors.black54),
                                     onTap: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return Dialog(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(20.0),
-                                            ),
-                                            elevation: 10,
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(20.0),
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    '${med['strength']} • $time',
-                                                    style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.deepPurpleAccent,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 10),
-                                                  Text(
-                                                    '${med['strength']} • ${med['type']}',
-                                                    style: const TextStyle(fontSize: 16, color: Colors.grey),
-                                                  ),
-                                                  const SizedBox(height: 20),
-                                                  Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Container(
-                                                        width:140,
-                                                        child: ElevatedButton(
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: Colors.green,
-                                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(12),
-                                                            ),
-                                                          ),
-                                                          onPressed: () {
-                                                            _updateMedicationUsage(
-                                                              med['id'],
-                                                              med['time'],
-                                                              selectedDayStr,
-                                                              true,
-                                                            );
-                                                            Navigator.of(context).pop();
-                                                          },
-                                                          child: Row(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: const [
-                                                              Icon(Icons.check, color: Colors.white),
-                                                              SizedBox(width: 8),
-                                                              Text('Kullandım', style: TextStyle(color: Colors.white)),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Container(
-                                                        width: 140,
-                                                        child: ElevatedButton(
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: Colors.red,
-                                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                                            shape: RoundedRectangleBorder(
-                                                              borderRadius: BorderRadius.circular(12),
-                                                            ),
-                                                          ),
-                                                          onPressed: () {
-                                                            _updateMedicationUsage(
-                                                              med['id'],
-                                                              med['time'],
-                                                              selectedDayStr,
-                                                              false,
-                                                            );
-                                                            Navigator.of(context).pop();
-                                                          },
-                                                          child: Row(
-                                                            mainAxisSize: MainAxisSize.min,
-                                                            children: const [
-                                                              Icon(Icons.close, color: Colors.white),
-                                                              SizedBox(width: 8),
-                                                              Text('Kullanmadım', style: TextStyle(color: Colors.white)),
-                                                            ],
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        },
+                                      final backgroundColor = parseFirebaseColor(med['color']);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MedicationDetailsScreen(
+                                            id : med['id'],
+                                            used : med['used'],
+                                            time : med['time'],
+                                            selectedDayStr : selectedDayStr,
+                                            name: med['name'],
+                                            strength: med['strength'],
+                                            type: med['type'],
+                                            backgroundColor: backgroundColor,
+                                            usedMedicine: med['usedMedicine'],
+                                            totalMedicine: med['totalMedicine'],
+                                            durationDays: med['durationDays'],
+                                          ),
+                                        ),
                                       );
-
                                     },
                                   ),
                                 ),
