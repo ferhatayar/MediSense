@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:medisense_app/views/drug_recommendation_screen.dart';
 import 'package:medisense_app/views/home_screen.dart';
 import 'package:medisense_app/views/pharmacy_screen.dart';
 import 'package:medisense_app/views/profile_screen.dart';
@@ -18,6 +19,7 @@ class _TabsScreenState extends State<TabsScreen> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const PharmacyScreen(),
+    DrugRecommendationScreen(),
     const ProfileScreen(),
   ];
 
@@ -29,10 +31,8 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Gelen arguments kontrol ediliyor
     final String? message = ModalRoute.of(context)?.settings.arguments as String?;
 
-    // SnackBar gösterimi
     if (message != null && !_isSnackBarShown) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -48,6 +48,7 @@ class _TabsScreenState extends State<TabsScreen> {
     return Scaffold(
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -59,12 +60,23 @@ class _TabsScreenState extends State<TabsScreen> {
             label: "",
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.medical_information),
+            label: "",
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: "",
           ),
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.deepPurpleAccent,
+        unselectedItemColor: Colors.grey,
+        selectedIconTheme: const IconThemeData(
+          size: 24,
+        ),
+        unselectedIconTheme: const IconThemeData(
+          size: 24,
+        ),
         onTap: _onItemTapped,
       ),
     );
