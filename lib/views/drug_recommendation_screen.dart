@@ -37,7 +37,7 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
       final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
       final content = [
         Content.text(
-            'Bir hasta için ilaç önerisi yap. Hastalık: ${diseaseController.text}, Yaş: ${ageController.text}, Boy: ${heightController.text}, Kilo: ${weightController.text}.')
+            'Bu hasta için ilaç önerisi yap. İlaç öneremesende iyi gelicek şeyler söyle. Ama ilaç önerebiliyorsan kesinlikle ilaç öner ve iyi gelicek şeylerde öner. Hastalık: ${diseaseController.text}, Yaş: ${ageController.text}, Boy: ${heightController.text}, Kilo: ${weightController.text}.')
       ];
 
       final response = await model.generateContent(content);
@@ -75,7 +75,10 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,  //en son bunu ekledim
+        backgroundColor: Colors.white,
         appBar: AppBar(
+          backgroundColor: Colors.white,
           title: Text("İlaç Öneri Sistemi"),
           centerTitle: true,
         ),
@@ -97,7 +100,7 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                           ),
                           padding: const EdgeInsets.all(12.0),
                           child: Text(
-                            "İyi günler. İlaç öneri sistememize hoşgeldiniz. Uygulamamız önericeği ilaçlar için herhangi bir sorumluluk üstlenmemektedir. Lütfen istenilen bilgileri giriniz.",
+                            "Merhaba. İlaç öneri sistememize hoşgeldiniz. Uygulamamız önericeği ilaçlar için herhangi bir sorumluluk üstlenmemektedir. Lütfen istenilen bilgileri giriniz.",
                             style: TextStyle(fontSize: 16),
                           ),
                         ),

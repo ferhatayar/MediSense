@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -52,27 +53,25 @@ class _SingUpScreenState extends State<SingUpScreen> {
       });
 
       try {
-        // 1. Kullanıcıyı Firebase Auth ile oluştur
         final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: tfEmail.text,
           password: tfSifre.text,
         );
 
-        // 2. Kullanıcı ID'sini al
         final userId = userCredential.user?.uid;
 
-        // 3. Profil resmini Firebase Storage'a yükle
         final profileImageUrl = await _uploadProfileImage(userId!);
 
-        // 4. Firestore'a kullanıcı verilerini kaydet
+        String? fcmToken = await FirebaseMessaging.instance.getToken();
+
         await FirebaseFirestore.instance.collection('users').doc(userId).set({
           'name': tfAdSoyad.text,
           'email': tfEmail.text,
           'profileImageUrl': profileImageUrl,
           'userId': userId,
+          'fcmToken': fcmToken,
         });
 
-        // 5. Başarılı kayıt sonrası anasayfaya yönlendir
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TabsScreen()));
 
       } on FirebaseAuthException catch (e) {

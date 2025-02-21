@@ -15,6 +15,7 @@ void main() async {
 
   await initializeDateFormatting('tr_TR', null);
 
+
   runApp(
       ChangeNotifierProvider(
           create: (context) => MedicationProvider(),

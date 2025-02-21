@@ -1198,6 +1198,8 @@ class MedicationReviewScreen extends StatelessWidget {
       );
       final totalMedicine = dailyTotalMedicine * medication.durationDays;
 
+      final currentUser = Auth().currentUser?.uid;
+
       // Prepare medication data for main document
       final medicationData = {
         'name': medication.name,
@@ -1210,6 +1212,7 @@ class MedicationReviewScreen extends StatelessWidget {
         'addedDate': DateTime.now().toIso8601String(),
         'usedMedicine': 0,
         'totalMedicine': totalMedicine,
+        'userId': currentUser,
         'times': medication.times.map((time) {
           return {
             'time': TimeOfDay.fromDateTime(time.time).format(context),
