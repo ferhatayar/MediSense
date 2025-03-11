@@ -34,13 +34,15 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
         isLoading = true;
       });
 
-      final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+      final model = GenerativeModel(model: 'gemini-2.0-flash', apiKey: apiKey);
       final content = [
         Content.text(
-            'Bu hasta için ilaç önerisi yap. İlaç öneremesende iyi gelicek şeyler söyle. Ama ilaç önerebiliyorsan kesinlikle ilaç öner ve iyi gelicek şeylerde öner. Hastalık: ${diseaseController.text}, Yaş: ${ageController.text}, Boy: ${heightController.text}, Kilo: ${weightController.text}.')
+            'Bu hasta için kesinlikle ilaç önerisi yap. İlaç önerinin yanında hastalığa iyi gelicek şeyleride söyle. Ve benim soruma cevap verme. Direkt ilacı ve iyi gelecek şeyleri açıklayarak yaz. Ancak cevabında madde işareti, yıldız (*) veya tire (-) kullanma. Yazını paragraflar halinde düzenle. Hastalık: ${diseaseController.text}, Yaş: ${ageController.text}, Boy: ${heightController.text}, Kilo: ${weightController.text}.')
       ];
 
       final response = await model.generateContent(content);
+
+      String cleanedResponse = cleanText(response.text ?? "Bir hata oluştu.");
 
       setState(() {
         messages.add(
@@ -49,6 +51,14 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
         isLoading = false;
       });
     }
+  }
+
+  String cleanText(String text) {
+    text = text.replaceAll(RegExp(r'[*•-]'), '');
+
+    text = text.replaceAll(RegExp(r'\n\s*\n'), '\n\n').trim();
+
+    return text;
   }
 
   void resetForm() {

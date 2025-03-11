@@ -1257,9 +1257,6 @@ class MedicationReviewScreen extends StatelessWidget {
     }
   }
 
-
-
-
   Widget _buildListTile(BuildContext context,
       {required String title, required String subtitle, Widget? trailing, required VoidCallback onTap}) {
     return ListTile(
