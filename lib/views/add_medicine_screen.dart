@@ -94,7 +94,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                         if (_formKey.currentState!.validate()) {
                           if (widget.isEditing) {
                             medicationProvider.updateMedicationName(tfMedicine.text);
-                            Navigator.pop(context);
+                            Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MedicationReviewScreen()));
                           } else {
                             medicationProvider.setMedication(
                               tfMedicine.text,
@@ -486,7 +486,7 @@ class _MedicineDurationScreenState extends State<MedicineDurationScreen> {
             ElevatedButton(
               onPressed: () {
                 if (widget.isEditing) {
-                  Navigator.pop(context);
+                  Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MedicationReviewScreen()));
                 } else {
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => MedicationStrengthInputPage()));
@@ -635,7 +635,7 @@ class _MedicationStrengthInputPageState
                           .updateMedicationStrength(strength);
 
                       if (widget.isEditing) {
-                        Navigator.pop(context);
+                        Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MedicationReviewScreen()));
                       } else {
                         // İlerleme yap
                         Navigator.push(
@@ -896,7 +896,7 @@ class _AddMedicationTimeScreenState extends State<AddMedicationTimeScreen> {
 
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       if (widget.isEditing) {
-                        Navigator.pop(context);
+                        Navigator.pushReplacement(context,MaterialPageRoute(builder: (context) => MedicationReviewScreen()));
                       } else {
                         Navigator.push(
                           context,

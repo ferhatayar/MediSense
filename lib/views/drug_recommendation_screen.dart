@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
@@ -74,6 +76,95 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
     });
   }
 
+  Future<void> saveToFirebase(String disease, String response) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      return;
+    }
+
+    final docRef = FirebaseFirestore.instance
+        .collection("illness")
+        .doc(user.uid)
+        .collection("records")
+        .doc();
+
+    await docRef.set({
+      "disease": disease,
+      "response": response,
+      "timestamp": FieldValue.serverTimestamp(),
+    });
+  }
+
+  void showSaveDialog() {
+    final rootContext = context;
+
+    showDialog(
+      context: rootContext,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.save, size: 50, color: Colors.blue),
+                const SizedBox(height: 16),
+                const Text(
+                  "Kaydet",
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  "Bu öneriyi kaydetmek istediğinize emin misiniz?",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      child: const Text("Hayır", style: TextStyle(fontSize: 16)),
+                    ),
+                    ElevatedButton(
+                      onPressed: () async {
+                        Navigator.of(context).pop();
+
+                        if (messages.isNotEmpty) {
+                          final lastMessage = messages.lastWhere((msg) => msg["role"] == "system");
+                          await saveToFirebase(diseaseController.text, lastMessage["message"] ?? "");
+
+                          ScaffoldMessenger.of(rootContext).showSnackBar(
+                            SnackBar(
+                              content: Text("${diseaseController.text} için ilaç önerisi kaydedildi."),
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text("Evet", style: TextStyle(fontSize: 16)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
+
+
   @override
   void initState() {
     super.initState();
@@ -91,6 +182,10 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
           backgroundColor: Colors.white,
           title: Text("İlaç Öneri Sistemi"),
           centerTitle: true,
+          leading: Container(),
+          actions: [
+            isResponseReceived ? IconButton(onPressed: showSaveDialog, icon: const Icon(Icons.save)) : Container()
+          ],
         ),
         body: Column(
           children: [
@@ -121,7 +216,7 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                     return Center(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(), // Yükleniyor animasyonu
+                        child: CircularProgressIndicator(),
                       ),
                     );
                   }

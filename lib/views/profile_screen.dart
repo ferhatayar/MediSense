@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:medisense_app/services/auth.dart';
 import 'package:medisense_app/views/edit_profile_screen.dart';
 import 'package:medisense_app/views/onboarding_screen.dart';
+import 'package:medisense_app/views/recommendations_list_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -17,6 +18,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String email = 'gmail';
   String profileImage = '';
   bool isLoading = true;
+  var currentUserId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   void initState() {
@@ -192,13 +194,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 10),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      // Profili düzenle sayfasına gidiyoruz
                       final isUpdated = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const EditProfileScreen()),
                       );
 
-                      // Eğer düzenleme yapıldıysa verileri yeniden alıyoruz
                       if (isUpdated == true) {
                         fetchUserData();
                       }
@@ -232,6 +232,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+            const Divider(thickness: 1),
+
+            ListTile(
+              leading: Icon(Icons.medication, color: Colors.black),
+              title: const Text(
+                'Kayıtlı İlaç Önerileri',
+                style: TextStyle(color: Colors.black),
+              ),
+              onTap: () {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> RecommendationsListScreen(currentUserId: currentUserId!)));
+              },
+            ),
+
             const Divider(thickness: 1),
 
             ListTile(

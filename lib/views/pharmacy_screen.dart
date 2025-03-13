@@ -5,6 +5,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:medisense_app/models/pharmacy.dart';
 import 'package:medisense_app/services/pharmacyservice.dart';
+import 'package:medisense_app/views/home_screen.dart';
+import 'package:medisense_app/views/tabs_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class PharmacyScreen extends StatefulWidget {
@@ -40,7 +42,17 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
 
   Future<void> _getCurrentLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) throw 'Konum servisleri devre dışı.';
+    if (!serviceEnabled) {
+      bool userAccepted = await _showLocationDialog();
+      if (userAccepted) {
+        await Geolocator.openLocationSettings();
+        await Future.delayed(const Duration(seconds: 3));
+        serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) throw 'Konum servisleri hâlâ kapalı.';
+      } else {
+        throw 'Konum servisleri açılmadı.';
+      }
+    }
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -48,13 +60,65 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
       if (permission == LocationPermission.denied) throw 'Konum izni reddedildi.';
     }
 
-    if (permission == LocationPermission.deniedForever) throw 'Konum izni kalıcı olarak reddedildi.';
+    if (permission == LocationPermission.deniedForever) {
+      throw 'Konum izni kalıcı olarak reddedildi. Lütfen ayarlardan açın.';
+    }
 
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState(() => currentPosition = position);
 
     await _fetchPharmacies(position.latitude, position.longitude);
   }
+
+  Future<bool> _showLocationDialog() async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.location_off, color: Colors.red, size: 28),
+              SizedBox(width: 10),
+              Text("Konum Gerekli", style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: const Text(
+            "Konum servisleri kapalı. Devam edebilmek için lütfen açın.",
+            style: TextStyle(fontSize: 16),
+          ),
+          actionsAlignment: MainAxisAlignment.spaceAround,
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              ),
+              onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  const TabsScreen())),
+              child: const Text("İptal", style: TextStyle(fontSize: 16)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text("Aç", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    ) ??
+        false;
+  }
+
 
   Future<void> _fetchPharmacies(double latitude, double longitude) async {
     PharmacyService service = PharmacyService();

@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:medisense_app/views/drug_recommendation_screen.dart';
 import 'package:medisense_app/views/home_screen.dart';
@@ -6,14 +5,16 @@ import 'package:medisense_app/views/pharmacy_screen.dart';
 import 'package:medisense_app/views/profile_screen.dart';
 
 class TabsScreen extends StatefulWidget {
-  const TabsScreen({super.key});
+  final int selectedIndex;
+
+  const TabsScreen({super.key, this.selectedIndex = 0});
 
   @override
   State<TabsScreen> createState() => _TabsScreenState();
 }
 
 class _TabsScreenState extends State<TabsScreen> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
   bool _isSnackBarShown = false;
 
   final List<Widget> _pages = [
@@ -22,6 +23,12 @@ class _TabsScreenState extends State<TabsScreen> {
     DrugRecommendationScreen(),
     const ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex;
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -71,12 +78,8 @@ class _TabsScreenState extends State<TabsScreen> {
         currentIndex: _selectedIndex,
         selectedItemColor: Colors.deepPurpleAccent,
         unselectedItemColor: Colors.grey,
-        selectedIconTheme: const IconThemeData(
-          size: 24,
-        ),
-        unselectedIconTheme: const IconThemeData(
-          size: 24,
-        ),
+        selectedIconTheme: const IconThemeData(size: 24),
+        unselectedIconTheme: const IconThemeData(size: 24),
         onTap: _onItemTapped,
       ),
     );
