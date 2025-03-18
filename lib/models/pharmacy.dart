@@ -43,15 +43,16 @@ class Pharmacy {
       town: json['town'] as String? ?? "",
       phone: json['phone'] as String? ?? "",
       phone2: json['phone2'] as String? ?? "",
-      dutyStart: json['pharmacyDutyStart'] as String? ?? "",
-      dutyEnd: json['pharmacyDutyEnd'] as String? ?? "",
+      dutyStart: json.containsKey('pharmacyDutyStart') ? json['pharmacyDutyStart'] as String? ?? "" : "",
+      dutyEnd: json.containsKey('pharmacyDutyEnd') ? json['pharmacyDutyEnd'] as String? ?? "" : "",
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
-      distanceMeters: json['distanceMt'] as int,
-      distanceKm: (json['distanceKm'] as num).toDouble(),
-      distanceMiles: (json['distanceMil'] as num).toDouble(),
+      distanceMeters: json['distanceMt'] as int? ?? 0,
+      distanceKm: (json['distanceKm'] as num?)?.toDouble() ?? 0.0,
+      distanceMiles: (json['distanceMil'] as num?)?.toDouble() ?? 0.0,
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {

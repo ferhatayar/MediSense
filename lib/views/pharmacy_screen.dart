@@ -5,7 +5,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:medisense_app/models/pharmacy.dart';
 import 'package:medisense_app/services/pharmacyservice.dart';
-import 'package:medisense_app/views/home_screen.dart';
 import 'package:medisense_app/views/tabs_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -23,6 +22,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
   Position? currentPosition;
   bool loading = true;
   static const double distanceLimit = 15.0;
+  bool showDutyPharmacies = true;
 
   @override
   void initState() {
@@ -67,7 +67,7 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     setState(() => currentPosition = position);
 
-    await _fetchPharmacies(position.latitude, position.longitude);
+    await _fetchPharmacies();
   }
 
   Future<bool> _showLocationDialog() async {
@@ -119,31 +119,82 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
         false;
   }
 
+  Future<void> _fetchPharmacies() async {
+    setState(() => loading = true);
 
-  Future<void> _fetchPharmacies(double latitude, double longitude) async {
+    if (currentPosition == null) {
+      setState(() => loading = false);
+      return;
+    }
+
     PharmacyService service = PharmacyService();
-    List<Pharmacy> fetchedPharmacies = await service.fetchDutyPharmacies(latitude, longitude);
+    List<Pharmacy> fetchedPharmacies = [];
 
-    List<Pharmacy> nearbyPharmacies = fetchedPharmacies.where((pharmacy) {
-      final distance = _calculateDistance(latitude, longitude, pharmacy.latitude, pharmacy.longitude);
-      return distance <= distanceLimit;
-    }).toList();
+    try {
+      if (showDutyPharmacies) {
+        fetchedPharmacies = await service.fetchDutyPharmacies(
+            currentPosition!.latitude,
+            currentPosition!.longitude
+        );
+      } else {
+        fetchedPharmacies = await service.fetchAllPharmacies(
+            currentPosition!.latitude,
+            currentPosition!.longitude
+        );
+      }
 
-    nearbyPharmacies.sort((a, b) {
-      final distanceA = _calculateDistance(latitude, longitude, a.latitude, a.longitude);
-      final distanceB = _calculateDistance(latitude, longitude, b.latitude, b.longitude);
-      return distanceA.compareTo(distanceB);
-    });
+      print("Fetched ${fetchedPharmacies.length} pharmacies (${showDutyPharmacies ? 'duty' : 'all'})");
 
-    setState(() {
-      pharmacies = nearbyPharmacies;
-      selectedPharmacy = null;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted && currentPosition != null) {
-          _mapController.move(LatLng(latitude, longitude), 14);
-        }
+      fetchedPharmacies = fetchedPharmacies.where((pharmacy) {
+        final distance = _calculateDistance(
+            currentPosition!.latitude,
+            currentPosition!.longitude,
+            pharmacy.latitude,
+            pharmacy.longitude
+        );
+        return distance <= distanceLimit;
+      }).toList();
+
+      print("After distance filtering: ${fetchedPharmacies.length} pharmacies remain");
+
+      // Sort by distance
+      fetchedPharmacies.sort((a, b) {
+        final distanceA = _calculateDistance(
+            currentPosition!.latitude,
+            currentPosition!.longitude,
+            a.latitude,
+            a.longitude
+        );
+        final distanceB = _calculateDistance(
+            currentPosition!.latitude,
+            currentPosition!.longitude,
+            b.latitude,
+            b.longitude
+        );
+        return distanceA.compareTo(distanceB);
       });
-    });
+
+      setState(() {
+        pharmacies = fetchedPharmacies;
+        selectedPharmacy = null;
+        loading = false;
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && currentPosition != null) {
+            _mapController.move(
+                LatLng(currentPosition!.latitude, currentPosition!.longitude),
+                14
+            );
+          }
+        });
+      });
+    } catch (e) {
+      print("Eczane verileri alınırken hata oluştu: $e");
+      setState(() {
+        pharmacies = [];
+        loading = false;
+      });
+    }
   }
 
   double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
@@ -176,41 +227,125 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
     }
   }
 
+  void _togglePharmacyType() {
+    setState(() {
+      showDutyPharmacies = !showDutyPharmacies;
+    });
+    _fetchPharmacies();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Nöbetçi Eczaneler"), centerTitle: true),
+      appBar: AppBar(
+        title: Text(showDutyPharmacies ? "Nöbetçi Eczaneler" : "Tüm Eczaneler"),
+        centerTitle: true,
+      ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : Column(
         children: [
+          Container(
+            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            color: Colors.blue.shade50,
+            child: Row(
+              children: [
+                Icon(showDutyPharmacies ? Icons.local_pharmacy : Icons.list, color: Colors.blue),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    showDutyPharmacies
+                        ? "Nöbetçi eczaneler gösteriliyor (${pharmacies.length})"
+                        : "Tüm eczaneler gösteriliyor (${pharmacies.length})",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                ElevatedButton.icon(
+                  icon: Icon(showDutyPharmacies ? Icons.list : Icons.local_pharmacy, size: 18),
+                  label: Text(showDutyPharmacies ? "Tüm Eczaneler" : "Nöbetçi Eczaneler"),
+                  onPressed: _togglePharmacyType,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
           pharmacies.isEmpty
-              ? const Center(child: Text("Yakınlarda eczane bulunamadı."))
+              ? Expanded(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.search_off, size: 64, color: Colors.grey),
+                  SizedBox(height: 16),
+                  Text(
+                    showDutyPharmacies
+                        ? "Yakınlarda nöbetçi eczane bulunamadı."
+                        : "Yakınlarda eczane bulunamadı.",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+          )
               : SizedBox(
             height: pharmacies.length <= 3 ? pharmacies.length * 100.0 : 300,
             child: ListView.builder(
               itemCount: pharmacies.length,
               itemBuilder: (context, index) {
                 final pharmacy = pharmacies[index];
-                return ListTile(
-                  title: Text(pharmacy.name),
-                  subtitle: Text(pharmacy.address),
-                  onTap: () => _onPharmacySelected(pharmacy),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.directions),
-                    onPressed: () => _launchMaps(pharmacy),
+                final distance = _calculateDistance(
+                    currentPosition!.latitude,
+                    currentPosition!.longitude,
+                    pharmacy.latitude,
+                    pharmacy.longitude);
+
+                return Card(
+                  margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: ListTile(
+                    title: Text(pharmacy.name, style: TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(pharmacy.address),
+                        Text(
+                          "Mesafe: ${distance.toStringAsFixed(1)} km",
+                          style: TextStyle(color: Colors.blue),
+                        ),
+                      ],
+                    ),
+                    isThreeLine: true,
+                    onTap: () => _onPharmacySelected(pharmacy),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.place, color: Colors.red),
+                          onPressed: () => _onPharmacySelected(pharmacy),
+                          tooltip: "Haritada Göster",
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.directions, color: Colors.blue),
+                          onPressed: () => _launchMaps(pharmacy),
+                          tooltip: "Yol Tarifi Al",
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },
             ),
           ),
-          Flexible(
+          SizedBox(height: 8), // Liste ile harita arasına hafif boşluk eklendi
+          Expanded(
             child: FlutterMap(
               mapController: _mapController,
               options: MapOptions(
                 initialCenter: currentPosition != null
                     ? LatLng(currentPosition!.latitude, currentPosition!.longitude)
-                    : LatLng(0, 0),
+                    : LatLng(41.0082, 28.9784),
                 initialZoom: 14,
               ),
               children: [
@@ -223,13 +358,24 @@ class _PharmacyScreenState extends State<PharmacyScreen> {
                     if (currentPosition != null)
                       Marker(
                         point: LatLng(currentPosition!.latitude, currentPosition!.longitude),
-                        child: const Icon(Icons.my_location, color: Colors.blue),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(0.7),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 2),
+                          ),
+                          child: Icon(Icons.my_location, color: Colors.white, size: 20),
+                        ),
                       ),
                     ...pharmacies.map((pharmacy) => Marker(
                       point: LatLng(pharmacy.latitude, pharmacy.longitude),
                       child: GestureDetector(
                         onTap: () => _onPharmacySelected(pharmacy),
-                        child: const Icon(Icons.location_on, color: Colors.red),
+                        child: Icon(
+                          Icons.local_pharmacy,
+                          color: selectedPharmacy == pharmacy ? Colors.green : Colors.red,
+                          size: selectedPharmacy == pharmacy ? 38 : 30,
+                        ),
                       ),
                     )),
                   ],

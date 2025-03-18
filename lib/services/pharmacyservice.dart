@@ -3,14 +3,27 @@ import 'package:http/http.dart' as http;
 import 'package:medisense_app/models/pharmacy.dart';
 
 class PharmacyService {
-  static const String baseUrl =
+  static const String dutyPharmaciesUrl =
       "https://www.nosyapi.com/apiv2/service/pharmacies-on-duty/locations";
+  static const String allPharmaciesUrl =
+      "https://www.nosyapi.com/apiv2/service/pharmaciesv2/locations";
   static const String apiKey =
       "LkFIW9BIRlcS5Cy9ZyCudkYvoos8XUngCSnoHE07JNlK5WZPodY2RsZpbKsV";
 
   Future<List<Pharmacy>> fetchDutyPharmacies(
       double latitude, double longitude) async {
-    final String url = "$baseUrl?latitude=$latitude&longitude=$longitude&apiKey=$apiKey";
+    return await _fetchPharmacies(dutyPharmaciesUrl, latitude, longitude);
+  }
+
+  Future<List<Pharmacy>> fetchAllPharmacies(
+      double latitude, double longitude) async {
+    return await _fetchPharmacies(allPharmaciesUrl, latitude, longitude);
+  }
+
+  Future<List<Pharmacy>> _fetchPharmacies(
+      String baseUrl, double latitude, double longitude) async {
+    String url = "$baseUrl?latitude=$latitude&longitude=$longitude&apiKey=$apiKey";
+
     print("API URL: $url");
 
     try {
