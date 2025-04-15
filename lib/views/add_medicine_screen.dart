@@ -1013,8 +1013,6 @@ class MedicationReviewScreen extends StatelessWidget {
       final period = time.period == DayPeriod.am ? 'AM' : 'PM';
       return '$hour:$minute $period';
     }
-
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -1147,6 +1145,11 @@ class MedicationReviewScreen extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => const Center(child: CircularProgressIndicator()),
+                  );
                   await saveMedicationToFirestore(context, medication);
                   medicationProvider.clearMedicationName();
                   medicationProvider.clearMedicationColor();
