@@ -162,9 +162,6 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
     );
   }
 
-
-
-
   @override
   void initState() {
     super.initState();
@@ -176,85 +173,188 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,  //en son bunu ekledim
-        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.grey[50],
         appBar: AppBar(
           backgroundColor: Colors.white,
-          title: Text("İlaç Öneri Sistemi"),
+          elevation: 0,
+          title: const Text(
+            "İlaç Öneri Sistemi",
+            style: TextStyle(
+              color: Colors.black87,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           centerTitle: true,
           leading: Container(),
           actions: [
-            isResponseReceived ? IconButton(onPressed: showSaveDialog, icon: const Icon(Icons.save)) : Container()
+            if (isResponseReceived)
+              IconButton(
+                onPressed: showSaveDialog,
+                icon: const Icon(Icons.save_alt, color: Colors.deepPurpleAccent),
+              )
           ],
         ),
         body: Column(
           children: [
             Expanded(
-              child: ListView.builder(
-                itemCount: messages.length + (isLoading ? 2 : 1),
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade100,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.all(12.0),
-                          child: Text(
-                            "Merhaba. İlaç öneri sistememize hoşgeldiniz. Uygulamamız önericeği ilaçlar için herhangi bir sorumluluk üstlenmemektedir. Lütfen istenilen bilgileri giriniz.",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-                  if (index == messages.length + 1 && isLoading) {
-                    return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-                  final message = messages[index - 1];
-                  final isUser = message["role"] == "user";
-                  return Align(
-                    alignment:
-                    isUser ? Alignment.centerRight : Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: isUser
-                              ? Colors.green.shade100
-                              : Colors.blue.shade100,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(
-                          message["message"] ?? "",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
                     ),
-                  );
-                },
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.only(top: 20),
+                    itemCount: messages.length + (isLoading ? 2 : 1),
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.deepPurpleAccent.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(15),
+                              border: Border.all(
+                                color: Colors.deepPurpleAccent.withOpacity(0.2),
+                                width: 1,
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(16),
+                            child: const Text(
+                              "Merhaba. İlaç öneri sistememize hoşgeldiniz. Uygulamamız önericeği ilaçlar için herhangi bir sorumluluk üstlenmemektedir. Lütfen istenilen bilgileri giriniz.",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                      if (index == messages.length + 1 && isLoading) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              children: [
+                                const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurpleAccent),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  "Öneriler hazırlanıyor...",
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+                      final message = messages[index - 1];
+                      final isUser = message["role"] == "user";
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        child: Align(
+                          alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                          child: Container(
+                            constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isUser
+                                  ? Colors.deepPurpleAccent.withOpacity(0.1)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: const Radius.circular(15),
+                                topRight: const Radius.circular(15),
+                                bottomLeft: Radius.circular(isUser ? 15 : 0),
+                                bottomRight: Radius.circular(isUser ? 0 : 15),
+                              ),
+                              border: Border.all(
+                                color: isUser
+                                    ? Colors.deepPurpleAccent.withOpacity(0.2)
+                                    : Colors.grey.withOpacity(0.2),
+                                width: 1,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 5,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            padding: const EdgeInsets.all(16),
+                            child: Text(
+                              message["message"] ?? "",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ),
             ),
             if (showInputFields)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 1,
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: [
                       TextFormField(
                         controller: diseaseController,
-                        decoration: InputDecoration(labelText: "Hastalığınız"),
+                        decoration: InputDecoration(
+                          labelText: "Hastalığınız",
+                          labelStyle: const TextStyle(color: Colors.black54),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.deepPurpleAccent),
+                          ),
+                        ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return "Hastalık adı boş olamaz.";
@@ -264,35 +364,85 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                           return null;
                         },
                       ),
-                      TextFormField(
-                        controller: ageController,
-                        decoration: InputDecoration(labelText: "Yaşınız"),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Yaş boş olamaz.";
-                          } else if (int.tryParse(value) == null) {
-                            return "Yaş sadece sayısal değer olmalıdır.";
-                          }
-                          return null;
-                        },
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: ageController,
+                              decoration: InputDecoration(
+                                labelText: "Yaşınız",
+                                labelStyle: const TextStyle(color: Colors.black54),
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(color: Colors.deepPurpleAccent),
+                                ),
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Yaş boş olamaz.";
+                                } else if (int.tryParse(value) == null) {
+                                  return "Yaş sadece sayısal değer olmalıdır.";
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: TextFormField(
+                              controller: heightController,
+                              decoration: InputDecoration(
+                                labelText: "Boyunuz (cm)",
+                                labelStyle: const TextStyle(color: Colors.black54),
+                                filled: true,
+                                fillColor: Colors.grey[50],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: const BorderSide(color: Colors.deepPurpleAccent),
+                                ),
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return "Boy boş olamaz.";
+                                } else if (int.tryParse(value) == null) {
+                                  return "Boy sadece sayısal değer olmalıdır.";
+                                }
+                                return null;
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      TextFormField(
-                        controller: heightController,
-                        decoration: InputDecoration(labelText: "Boyunuz (cm)"),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Boy boş olamaz.";
-                          } else if (int.tryParse(value) == null) {
-                            return "Boy sadece sayısal değer olmalıdır.";
-                          }
-                          return null;
-                        },
-                      ),
+                      const SizedBox(height: 16),
                       TextFormField(
                         controller: weightController,
-                        decoration: InputDecoration(labelText: "Kilonuz (kg)"),
+                        decoration: InputDecoration(
+                          labelText: "Kilonuz (kg)",
+                          labelStyle: const TextStyle(color: Colors.black54),
+                          filled: true,
+                          fillColor: Colors.grey[50],
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.deepPurpleAccent),
+                          ),
+                        ),
                         keyboardType: TextInputType.number,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -303,10 +453,28 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 8),
-                      ElevatedButton(
-                        onPressed: sendMessage,
-                        child: Text("Gönder"),
+                      const SizedBox(height: 20),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: sendMessage,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurpleAccent,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 2,
+                          ),
+                          child: const Text(
+                            "Öneri Al",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -316,9 +484,10 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
         ),
         floatingActionButton: isResponseReceived
             ? FloatingActionButton(
-          onPressed: resetForm,
-          child: Icon(Icons.refresh),
-        )
+                onPressed: resetForm,
+                backgroundColor: Colors.deepPurpleAccent,
+                child: const Icon(Icons.refresh, color: Colors.white),
+              )
             : null,
       ),
     );

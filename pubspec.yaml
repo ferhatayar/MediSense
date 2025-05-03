@@ -58,7 +58,6 @@ dependencies:
   firebase_messaging: ^15.2.1
   googleapis: ^13.2.0
   googleapis_auth: ^1.6.0
-  workmanager: ^0.5.2
   google_fonts: ^6.2.1
 
 dev_dependencies:

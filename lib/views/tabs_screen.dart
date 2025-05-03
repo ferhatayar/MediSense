@@ -6,8 +6,9 @@ import 'package:medisense_app/views/profile_screen.dart';
 
 class TabsScreen extends StatefulWidget {
   final int selectedIndex;
+  final DateTime? selectedDate;
 
-  const TabsScreen({super.key, this.selectedIndex = 0});
+  const TabsScreen({super.key, this.selectedIndex = 0, this.selectedDate});
 
   @override
   State<TabsScreen> createState() => _TabsScreenState();
@@ -28,6 +29,9 @@ class _TabsScreenState extends State<TabsScreen> {
   void initState() {
     super.initState();
     _selectedIndex = widget.selectedIndex;
+    if (widget.selectedDate != null) {
+      _pages[0] = HomeScreen(selectedDate: widget.selectedDate);
+    }
   }
 
   void _onItemTapped(int index) {

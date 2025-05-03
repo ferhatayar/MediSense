@@ -1,0 +1,2 @@
+/Users/ferhatayar/Desktop/medisense-app/android/app/.cxx/Debug/s3x5t1h2/armeabi-v7a/CMakeFiles/rebuild_cache.dir
+/Users/ferhatayar/Desktop/medisense-app/android/app/.cxx/Debug/s3x5t1h2/armeabi-v7a/CMakeFiles/edit_cache.dir
