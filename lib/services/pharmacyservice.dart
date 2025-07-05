@@ -8,7 +8,7 @@ class PharmacyService {
   static const String allPharmaciesUrl =
       "https://www.nosyapi.com/apiv2/service/pharmaciesv2/locations";
   static const String apiKey =
-      "LkFIW9BIRlcS5Cy9ZyCudkYvoos8XUngCSnoHE07JNlK5WZPodY2RsZpbKsV";
+      "your-api-key";
 
   Future<List<Pharmacy>> fetchDutyPharmacies(
       double latitude, double longitude) async {
