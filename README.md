@@ -216,10 +216,10 @@ Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için `LICENSE` dosy
 
 ## 📞 İletişim
 
-- **Geliştirici**: [Adınız]
-- **Email**: [email@example.com]
-- **LinkedIn**: [LinkedIn Profiliniz]
-- **GitHub**: [GitHub Profiliniz]
+- **Geliştirici**: [Ferhat AYAR]
+- **Email**: [ferhat.ayar28@gmail.com]
+- **LinkedIn**: [https://www.linkedin.com/in/ferhat-ayar-a99180283/]
+- **GitHub**: [https://github.com/ferhatayar]
 
 ## 🙏 Teşekkürler
 
