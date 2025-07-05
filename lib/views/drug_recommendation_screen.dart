@@ -21,7 +21,7 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
   bool isResponseReceived = false;
   bool isLoading = false;
 
-  final String apiKey = "AIzaSyAMzTvcQif3IKVeU7pBDmAVaN9xfRRHyBE";
+  final String apiKey = "your-gemini-api-key";
 
   void sendMessage() async {
     if (_formKey.currentState!.validate()) {
