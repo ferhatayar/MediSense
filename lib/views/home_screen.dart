@@ -5,6 +5,7 @@ import 'package:medisense_app/services/auth.dart';
 import 'package:medisense_app/views/add_medicine_screen.dart';
 import 'package:medisense_app/views/medication_details_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:medisense_app/views/notifications_screen.dart';
 import 'dart:core';
 
 class HomeScreen extends StatefulWidget {
@@ -70,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
           
           // Alfa değeri ile birlikte ARGB formatında renk oluştur
           final color = Color.fromARGB(255, red, green, blue);
-          return color;
+      return color;
         }
       }
 
@@ -250,7 +251,15 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.notifications)),
+          IconButton(
+            icon: const Icon(Icons.notifications, color: Colors.deepPurpleAccent),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+              );
+            },
+          ),
         ],
       ),
       body: Column(
@@ -345,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     if (validMeds.isEmpty) {
                       return const Center(child: Text('Bu tarihte herhangi bir ilaç yok.'));
-                    }
+                        }
 
                     // Saatlere göre grupla ve sırala
                     Map<String, List<Map<String, dynamic>>> groupedMeds = {};
@@ -434,16 +443,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                             .delete();
 
                                         if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(content: Text('${medData['name'] ?? 'Bilinmeyen İlaç'} ilacı kaldırıldı')),
-                                          );
+                                        );
                                         }
                                         return true;
                                       } catch (e) {
                                         if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                             SnackBar(content: Text('Hata: $e')),
-                                          );
+                                        );
                                         }
                                         return false;
                                       }
@@ -471,7 +480,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         borderRadius: BorderRadius.circular(16),
                                       ),
-                                      child: ListTile(
+                                  child: ListTile(
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                                         leading: Container(
                                           width: 56,
@@ -497,7 +506,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                         title: Text(
                                           medData['name'] ?? 'Bilinmeyen İlaç',
-                                          style: const TextStyle(
+                                        style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16,
                                           ),
@@ -530,17 +539,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     : Icons.cancel,
                                             color: med['used'] == null
                                                 ? Colors.grey[600]
-                                                : med['used'] == true
+                                        : med['used'] == true
                                                     ? Colors.green
                                                     : Colors.red,
                                             size: 24,
                                           ),
                                         ),
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => MedicationDetailsScreen(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MedicationDetailsScreen(
                                                 id: med['docId'] ?? '',
                                                 used: med['used'],
                                                 time: med['time'] ?? '00:00',
@@ -552,10 +561,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 usedMedicine: medData['usedMedicine'] ?? 0,
                                                 totalMedicine: medData['totalMedicine'] ?? 0,
                                                 durationDays: medData['durationDays'] ?? 0,
-                                              ),
-                                            ),
-                                          );
-                                        },
+                                          ),
+                                        ),
+                                      );
+                                    },
                                       ),
                                     ),
                                   ),

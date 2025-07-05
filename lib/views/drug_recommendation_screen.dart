@@ -219,37 +219,37 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                   ),
-                  child: ListView.builder(
+              child: ListView.builder(
                     padding: const EdgeInsets.only(top: 20),
-                    itemCount: messages.length + (isLoading ? 2 : 1),
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
+                itemCount: messages.length + (isLoading ? 2 : 1),
+                itemBuilder: (context, index) {
+                  if (index == 0) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                          child: Container(
-                            decoration: BoxDecoration(
+                        child: Container(
+                          decoration: BoxDecoration(
                               color: Colors.deepPurpleAccent.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(15),
                               border: Border.all(
                                 color: Colors.deepPurpleAccent.withOpacity(0.2),
                                 width: 1,
                               ),
-                            ),
+                          ),
                             padding: const EdgeInsets.all(16),
                             child: const Text(
-                              "Merhaba. İlaç öneri sistememize hoşgeldiniz. Uygulamamız önericeği ilaçlar için herhangi bir sorumluluk üstlenmemektedir. Lütfen istenilen bilgileri giriniz.",
+                            "Merhaba. İlaç öneri sistememize hoşgeldiniz. Uygulamamız önericeği ilaçlar için herhangi bir sorumluluk üstlenmemektedir. Lütfen istenilen bilgileri giriniz.",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.black87,
                                 height: 1.5,
-                              ),
-                            ),
                           ),
-                        );
-                      }
-                      if (index == messages.length + 1 && isLoading) {
-                        return Center(
-                          child: Padding(
+                        ),
+                      ),
+                    );
+                  }
+                  if (index == messages.length + 1 && isLoading) {
+                    return Center(
+                      child: Padding(
                             padding: const EdgeInsets.all(20.0),
                             child: Column(
                               children: [
@@ -266,21 +266,21 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                                 ),
                               ],
                             ),
-                          ),
-                        );
-                      }
-                      final message = messages[index - 1];
-                      final isUser = message["role"] == "user";
+                      ),
+                    );
+                  }
+                  final message = messages[index - 1];
+                  final isUser = message["role"] == "user";
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         child: Align(
                           alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                          child: Container(
+                      child: Container(
                             constraints: BoxConstraints(
                               maxWidth: MediaQuery.of(context).size.width * 0.8,
                             ),
-                            decoration: BoxDecoration(
-                              color: isUser
+                        decoration: BoxDecoration(
+                          color: isUser
                                   ? Colors.deepPurpleAccent.withOpacity(0.1)
                                   : Colors.white,
                               borderRadius: BorderRadius.only(
@@ -303,20 +303,20 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                                   offset: const Offset(0, 2),
                                 ),
                               ],
-                            ),
+                        ),
                             padding: const EdgeInsets.all(16),
-                            child: Text(
-                              message["message"] ?? "",
+                        child: Text(
+                          message["message"] ?? "",
                               style: TextStyle(
                                 fontSize: 16,
                                 color: Colors.black87,
                                 height: 1.5,
                               ),
-                            ),
-                          ),
                         ),
-                      );
-                    },
+                      ),
+                    ),
+                  );
+                },
                   ),
                 ),
               ),
@@ -369,7 +369,7 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                         children: [
                           Expanded(
                             child: TextFormField(
-                              controller: ageController,
+                        controller: ageController,
                               decoration: InputDecoration(
                                 labelText: "Yaşınız",
                                 labelStyle: const TextStyle(color: Colors.black54),
@@ -384,21 +384,21 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                                   borderSide: const BorderSide(color: Colors.deepPurpleAccent),
                                 ),
                               ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Yaş boş olamaz.";
-                                } else if (int.tryParse(value) == null) {
-                                  return "Yaş sadece sayısal değer olmalıdır.";
-                                }
-                                return null;
-                              },
-                            ),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Yaş boş olamaz.";
+                          } else if (int.tryParse(value) == null) {
+                            return "Yaş sadece sayısal değer olmalıdır.";
+                          }
+                          return null;
+                        },
+                      ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: TextFormField(
-                              controller: heightController,
+                        controller: heightController,
                               decoration: InputDecoration(
                                 labelText: "Boyunuz (cm)",
                                 labelStyle: const TextStyle(color: Colors.black54),
@@ -413,16 +413,16 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                                   borderSide: const BorderSide(color: Colors.deepPurpleAccent),
                                 ),
                               ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return "Boy boş olamaz.";
-                                } else if (int.tryParse(value) == null) {
-                                  return "Boy sadece sayısal değer olmalıdır.";
-                                }
-                                return null;
-                              },
-                            ),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Boy boş olamaz.";
+                          } else if (int.tryParse(value) == null) {
+                            return "Boy sadece sayısal değer olmalıdır.";
+                          }
+                          return null;
+                        },
+                      ),
                           ),
                         ],
                       ),
@@ -458,7 +458,7 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
                         width: double.infinity,
                         height: 50,
                         child: ElevatedButton(
-                          onPressed: sendMessage,
+                        onPressed: sendMessage,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.deepPurpleAccent,
                             foregroundColor: Colors.white,
@@ -484,10 +484,10 @@ class _DrugRecommendationScreenState extends State<DrugRecommendationScreen> {
         ),
         floatingActionButton: isResponseReceived
             ? FloatingActionButton(
-                onPressed: resetForm,
+          onPressed: resetForm,
                 backgroundColor: Colors.deepPurpleAccent,
                 child: const Icon(Icons.refresh, color: Colors.white),
-              )
+        )
             : null,
       ),
     );

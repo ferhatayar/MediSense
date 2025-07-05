@@ -1240,6 +1240,7 @@ class MedicationReviewScreen extends StatelessWidget {
             return {
               'time': formatTimeOfDayToAMPM(TimeOfDay.fromDateTime(time.time)),
               'used': null,
+              'isRead': false,
             };
           }).toList(),
         };

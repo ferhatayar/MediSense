@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "434836595313",
+    "firebase_url": "https://medisenseapp-ece7b-default-rtdb.firebaseio.com",
     "project_id": "medisenseapp-ece7b",
     "storage_bucket": "medisenseapp-ece7b.appspot.com"
   },

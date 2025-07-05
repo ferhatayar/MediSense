@@ -3,6 +3,9 @@ import 'package:medisense_app/views/drug_recommendation_screen.dart';
 import 'package:medisense_app/views/home_screen.dart';
 import 'package:medisense_app/views/pharmacy_screen.dart';
 import 'package:medisense_app/views/profile_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:medisense_app/views/notifications_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TabsScreen extends StatefulWidget {
   final int selectedIndex;
@@ -25,6 +28,13 @@ class _TabsScreenState extends State<TabsScreen> {
     const ProfileScreen(),
   ];
 
+  final List<String> _pageTitles = [
+    "Home",
+    "Pharmacy",
+    "Drug Recommendation",
+    "Profile",
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +52,7 @@ class _TabsScreenState extends State<TabsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid ?? '';
     final String? message = ModalRoute.of(context)?.settings.arguments as String?;
 
     if (message != null && !_isSnackBarShown) {

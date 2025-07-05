@@ -9,6 +9,8 @@
 
 const {onRequest} = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
 
 // Create and deploy your first functions
 // https://firebase.google.com/docs/functions/get-started
@@ -20,7 +22,6 @@ const logger = require("firebase-functions/logger");
 
 
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
-const admin = require("firebase-admin");
 const { CloudSchedulerClient } = require("@google-cloud/scheduler");
 
 admin.initializeApp();
@@ -148,6 +149,112 @@ exports.sendMedicineReminder = onRequest(async (req, res) => {
   } catch (error) {
     console.error("🚨 Bildirim gönderme hatası:", error);
     return res.status(500).send("Internal Server Error");
+  }
+});
+
+exports.checkMedications = functions.scheduler.onSchedule('every 24 hours', async (context) => {
+  // Türkiye saatine göre şu an
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
+  const todayStr = now.toISOString().split('T')[0];
+  
+  console.log('🕒 Fonksiyon başladı:', now.toISOString());
+  
+  // Tüm kullanıcıları al
+  const users = await admin.firestore().collection('users').get();
+  console.log('👥 Toplam kullanıcı sayısı:', users.size);
+  
+  for (const userDoc of users.docs) {
+    const userId = userDoc.id;
+    console.log('👤 Kullanıcı kontrol ediliyor:', userId);
+    
+    // Kullanıcının ilaçlarını al
+    const medications = await admin.firestore()
+      .collection('medications')
+      .doc(userId)
+      .collection('medicines')
+      .get();
+    
+    console.log('💊 Kullanıcının ilaç sayısı:', medications.size);
+    
+    for (const medDoc of medications.docs) {
+      const medData = medDoc.data();
+      console.log('🔍 İlaç kontrol ediliyor:', medData.name);
+      
+      // Bugünün loglarını al
+      const todayLog = await medDoc.ref
+        .collection('logs')
+        .doc(todayStr)
+        .get();
+      
+      if (!todayLog.exists) {
+        console.log('📅 Bugün için log bulunamadı');
+        continue;
+      }
+      
+      const logData = todayLog.data();
+      if (!logData || !logData.times) {
+        console.log('⏰ Times verisi bulunamadı');
+        continue;
+      }
+      
+      console.log('⏰ Times verisi:', logData.times);
+      
+      // Her saati kontrol et
+      for (const timeData of logData.times) {
+        if (timeData.used !== null) {
+          console.log('✅ Zaten kullanılmış:', timeData.time);
+          continue;
+        }
+        
+        // Saat-parsing: "3:25 PM" gibi
+        let [hour, minute] = timeData.time.replace('PM', '').replace('AM', '').split(':').map(Number);
+        const isPM = timeData.time.includes('PM');
+        const isAM = timeData.time.includes('AM');
+        if (isPM && hour !== 12) hour += 12;
+        if (isAM && hour === 12) hour = 0;
+        
+        // Türkiye saatine göre bugünün o saatini oluştur
+        const medicationTime = new Date(now);
+        medicationTime.setHours(hour, minute, 0, 0);
+        
+        const oneMinuteAgo = new Date(now.getTime() - 60 * 1000);
+        console.log('⏰ İlaç zamanı:', medicationTime.toISOString());
+        console.log('🕒 Şu anki zaman:', now.toISOString());
+        
+        if (medicationTime > oneMinuteAgo && medicationTime <= now) {
+          console.log('🔔 Bildirim gönderilecek');
+          
+          // Bildirim gönder
+          const userData = userDoc.data();
+          if (userData && userData.fcmToken) {
+            console.log('📱 FCM Token bulundu');
+            
+            try {
+              await admin.messaging().send({
+                token: userData.fcmToken,
+                notification: {
+                  title: 'İlaç Hatırlatıcı',
+                  body: `${medData.name} ilacınızı almanız gerekiyor!`
+                },
+                data: {
+                  medicineId: medDoc.id,
+                  logDate: todayStr,
+                  time: timeData.time
+                }
+              });
+              
+              console.log('✅ Bildirim gönderildi');
+            } catch (error) {
+              console.error('❌ Bildirim gönderme hatası:', error);
+            }
+          } else {
+            console.log('❌ FCM Token bulunamadı');
+          }
+        } else {
+          console.log('⏳ Henüz zamanı gelmedi veya geçmişteki saat');
+        }
+      }
+    }
   }
 });
 

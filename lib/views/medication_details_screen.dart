@@ -359,67 +359,67 @@ class _MedicationDetailsScreenState extends State<MedicationDetailsScreen> {
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: widget.backgroundColor,
-          extendBodyBehindAppBar: true,
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.arrow_back, color: Colors.white),
+      backgroundColor: widget.backgroundColor,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.arrow_back, color: Colors.white),
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: Stack(
+        children: [
+          // Background gradient
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  widget.backgroundColor,
+                  darkColor,
+                ],
               ),
-              onPressed: () => Navigator.of(context).pop(),
             ),
           ),
-          body: Stack(
-            children: [
-              // Background gradient
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      widget.backgroundColor,
-                      darkColor,
-                    ],
-                  ),
-                ),
-              ),
 
-              // Background decoration
-              Positioned(
-                top: -50,
-                right: -50,
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.05),
-                  ),
-                ),
+          // Background decoration
+          Positioned(
+            top: -50,
+            right: -50,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.05),
               ),
+            ),
+          ),
 
-              Positioned(
-                bottom: -80,
-                left: -80,
-                child: Container(
-                  width: 300,
-                  height: 300,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white.withOpacity(0.05),
-                  ),
-                ),
+          Positioned(
+            bottom: -80,
+            left: -80,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.05),
               ),
+            ),
+          ),
 
-              SafeArea(
+          SafeArea(
                 child: _isInitializing
                     ? const Center(
                         child: CircularProgressIndicator(
@@ -427,308 +427,308 @@ class _MedicationDetailsScreenState extends State<MedicationDetailsScreen> {
                         ),
                       )
                     : Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  // Medicine name and icon
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const SizedBox(height: 16),
-                            // Medicine name and icon
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            Text(
+                              widget.name,
+                              style: GoogleFonts.montserrat(
+                                fontSize: 36,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                widget.strength,
+                                style: GoogleFonts.montserrat(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: SizedBox(
+                          height: 70,
+                          width: 70,
+                          child: Image.asset(
+                            'assets/medicines/${widget.type.toLowerCase()}.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // Progress circle
+                  Center(
+                    child: Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        child: Stack(
+                          alignment: Alignment.center,
+                          children: [
+                            SizedBox(
+                              width: 160,
+                              height: 160,
+                              child: CircularProgressIndicator(
+                                          value: totalMedicine > 0 
+                                              ? usedMedicine / totalMedicine 
+                                              : 0,
+                                backgroundColor: Colors.white.withOpacity(0.2),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white.withOpacity(0.9),
+                                ),
+                                strokeWidth: 12,
+                              ),
+                            ),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        widget.name,
-                                        style: GoogleFonts.montserrat(
-                                          fontSize: 36,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.2),
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        child: Text(
-                                          widget.strength,
-                                          style: GoogleFonts.montserrat(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
+                                Text(
+                                  "Kullanım",
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 14,
+                                    color: Colors.white.withOpacity(0.7),
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: SizedBox(
-                                    height: 70,
-                                    width: 70,
-                                    child: Image.asset(
-                                      'assets/medicines/${widget.type.toLowerCase()}.png',
-                                      fit: BoxFit.contain,
-                                    ),
+                                const SizedBox(height: 4),
+                                Text(
+                                            "$usedMedicine/$totalMedicine",
+                                  style: GoogleFonts.montserrat(
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
                             ),
-
-                            const SizedBox(height: 40),
-
-                            // Progress circle
-                            Center(
-                              child: Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(100),
-                                ),
-                                child: Container(
-                                  padding: const EdgeInsets.all(16),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.05),
-                                    borderRadius: BorderRadius.circular(100),
-                                  ),
-                                  child: Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: 160,
-                                        height: 160,
-                                        child: CircularProgressIndicator(
-                                          value: totalMedicine > 0 
-                                              ? usedMedicine / totalMedicine 
-                                              : 0,
-                                          backgroundColor: Colors.white.withOpacity(0.2),
-                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                            Colors.white.withOpacity(0.9),
-                                          ),
-                                          strokeWidth: 12,
-                                        ),
-                                      ),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            "Kullanım",
-                                            style: GoogleFonts.montserrat(
-                                              fontSize: 14,
-                                              color: Colors.white.withOpacity(0.7),
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            "$usedMedicine/$totalMedicine",
-                                            style: GoogleFonts.montserrat(
-                                              fontSize: 36,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(height: 40),
-
-                            // Info box
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.6),
-                                borderRadius: BorderRadius.circular(24),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 5),
-                                  ),
-                                ],
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Column(
-                                    children: [
-                                      Text(
-                                        "1",
-                                        style: GoogleFonts.montserrat(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        widget.type,
-                                        style: GoogleFonts.montserrat(
-                                          fontSize: 14,
-                                          color: Colors.white.withOpacity(0.7),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Container(
-                                    width: 1,
-                                    height: 50,
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
-                                  Column(
-                                    children: [
-                                      Text(
-                                        "${widget.durationDays}",
-                                        style: GoogleFonts.montserrat(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        "Gün",
-                                        style: GoogleFonts.montserrat(
-                                          fontSize: 14,
-                                          color: Colors.white.withOpacity(0.7),
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-
-                            const Spacer(),
-
-                            // Status indicator or buttons
-                            widget.used == null
-                                ? Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () => _showConfirmationDialog(true),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.green,
-                                            foregroundColor: Colors.white,
-                                            padding: const EdgeInsets.symmetric(vertical: 16),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(16),
-                                            ),
-                                            elevation: 4,
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Icon(Icons.check, color: Colors.white),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                "Kullandım",
-                                                style: GoogleFonts.montserrat(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Expanded(
-                                        child: ElevatedButton(
-                                          onPressed: () => _showConfirmationDialog(false),
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.red,
-                                            foregroundColor: Colors.white,
-                                            padding: const EdgeInsets.symmetric(vertical: 16),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(16),
-                                            ),
-                                            elevation: 4,
-                                          ),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              const Icon(Icons.close, color: Colors.white),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                "Kullanmadım",
-                                                style: GoogleFonts.montserrat(
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(vertical: 24),
-                                    decoration: BoxDecoration(
-                                      color: (widget.used ?? false)
-                                          ? Colors.green.withOpacity(0.3)
-                                          : Colors.red.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          (widget.used ?? false) ? Icons.check_circle : Icons.cancel,
-                                          color: Colors.white,
-                                          size: 28,
-                                        ),
-                                        const SizedBox(width: 12),
-                                        Text(
-                                          (widget.used ?? false) ? "İlaç Kullanılmış" : "İlaç Kullanılmamış",
-                                          style: GoogleFonts.montserrat(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                            const SizedBox(height: 40),
                           ],
                         ),
                       ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  // Info box
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.6),
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Column(
+                          children: [
+                            Text(
+                              "1",
+                              style: GoogleFonts.montserrat(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              widget.type,
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14,
+                                color: Colors.white.withOpacity(0.7),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          width: 1,
+                          height: 50,
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              "${widget.durationDays}",
+                              style: GoogleFonts.montserrat(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Gün",
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14,
+                                color: Colors.white.withOpacity(0.7),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Spacer(),
+
+                  // Status indicator or buttons
+                  widget.used == null
+                      ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                                          onPressed: () => _showConfirmationDialog(true),
+                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.green,
+                                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 4,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                                              const Icon(Icons.check, color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Kullandım",
+                                style: GoogleFonts.montserrat(
+                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                                          onPressed: () => _showConfirmationDialog(false),
+                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 4,
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                                              const Icon(Icons.close, color: Colors.white),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Kullanmadım",
+                                style: GoogleFonts.montserrat(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                      : Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    decoration: BoxDecoration(
+                                      color: (widget.used ?? false)
+                          ? Colors.green.withOpacity(0.3)
+                          : Colors.red.withOpacity(0.3),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                                          (widget.used ?? false) ? Icons.check_circle : Icons.cancel,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                                          (widget.used ?? false) ? "İlaç Kullanılmış" : "İlaç Kullanılmamış",
+                          style: GoogleFonts.montserrat(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                ],
               ),
-            ],
+            ),
           ),
+        ],
+      ),
         ),
         if (_isLoading)
-          Container(
+                    Container(
             color: Colors.black.withOpacity(0.5),
             child: const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
-            ),
-          ),
-      ],
+                        ),
+                      ),
+                    ),
+                  ],
     );
   }
 }
